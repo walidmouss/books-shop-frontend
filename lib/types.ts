@@ -22,6 +22,7 @@ export interface Book {
   price: number;
   category: string;
   thumbnail: string;
+  createdBy: string; // user id of creator
   description?: string;
   createdAt: string;
   updatedAt: string;

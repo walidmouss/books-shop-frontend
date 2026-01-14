@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockBooks } from "@/lib/mocks/books";
 
-// Mock books API endpoints
-export async function GET() {
+// Mock books API endpoints with server-side search/sort/pagination
+export async function GET(request: NextRequest) {
   try {
-    // TODO: Fetch from real database
-    // Support query params for search, filter, pagination
-    return NextResponse.json({ books: mockBooks });
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const pageSize = Math.max(1, parseInt(searchParams.get("pageSize") || "12", 10));
+    const search = (searchParams.get("search") || "").toLowerCase();
+    const sort = (searchParams.get("sort") === "desc" ? "desc" : "asc") as "asc" | "desc";
+
+    let data = [...mockBooks];
+
+    if (search) {
+      data = data.filter((b) => b.title.toLowerCase().includes(search));
+    }
+
+    data.sort((a, b) => {
+      const res = a.title.localeCompare(b.title);
+      return sort === "asc" ? res : -res;
+    });
+
+    const total = data.length;
+    const start = (page - 1) * pageSize;
+    const items = data.slice(start, start + pageSize);
+
+    return NextResponse.json({ items, total, page, pageSize });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
