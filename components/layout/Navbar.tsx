@@ -9,13 +9,15 @@ import type { User } from "@/lib/types";
 
 export interface NavbarProps {
   user: User | null;
+  currentPath?: string;
   onViewProfile?: () => void;
   onEditProfile?: () => void;
   onMyBooks?: () => void;
+  onBookShop?: () => void;
   onLogout?: () => void;
 }
 
-export function Navbar({ user, onViewProfile, onEditProfile, onMyBooks, onLogout }: NavbarProps) {
+export function Navbar({ user, currentPath, onViewProfile, onEditProfile, onMyBooks, onBookShop, onLogout }: NavbarProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,6 +32,10 @@ export function Navbar({ user, onViewProfile, onEditProfile, onMyBooks, onLogout
   const handleMyBooks = useCallback(() => {
     onMyBooks?.();
   }, [onMyBooks]);
+
+  const handleBookShop = useCallback(() => {
+    onBookShop?.();
+  }, [onBookShop]);
 
   const handleLogout = useCallback(async () => {
     setIsLoading(true);
@@ -57,9 +63,11 @@ export function Navbar({ user, onViewProfile, onEditProfile, onMyBooks, onLogout
         {user && !isLoading && (
           <ProfileMenu
             user={user}
+            currentPath={currentPath}
             onViewProfile={handleViewProfile}
             onEditProfile={handleEditProfile}
             onMyBooks={handleMyBooks}
+            onBookShop={handleBookShop}
             onLogout={handleLogout}
           />
         )}

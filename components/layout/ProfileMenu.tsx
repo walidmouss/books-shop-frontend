@@ -5,17 +5,21 @@ import type { User } from "@/lib/types";
 
 export interface ProfileMenuProps {
   user: User;
+  currentPath?: string;
   onViewProfile?: () => void;
   onEditProfile: () => void;
   onMyBooks?: () => void;
+  onBookShop?: () => void;
   onLogout: () => void;
 }
 
 export function ProfileMenu({
   user,
+  currentPath,
   onViewProfile,
   onEditProfile,
   onMyBooks,
+  onBookShop,
   onLogout,
 }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -90,11 +94,15 @@ export function ProfileMenu({
           <button
             onClick={() => {
               setIsOpen(false);
-              onMyBooks?.();
+              if (currentPath?.includes("/my-books")) {
+                onBookShop?.();
+              } else {
+                onMyBooks?.();
+              }
             }}
             className="block w-full px-4 py-2 text-left text-sm text-black hover:bg-neutral-50 dark:text-white dark:hover:bg-neutral-800"
           >
-            My Books
+            {currentPath?.includes("/my-books") ? "Book Shop" : "My Books"}
           </button>
 
           <button

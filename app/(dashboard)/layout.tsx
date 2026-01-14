@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import type { User } from "@/lib/types";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -37,6 +38,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push("/my-books");
   }, [router]);
 
+  const handleBookShop = useCallback(() => {
+    router.push("/books");
+  }, [router]);
+
   const handleLogout = useCallback(async () => {
     try {
       // Call logout API to clear auth token on server
@@ -53,9 +58,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       <Navbar
         user={user}
+        currentPath={pathname}
         onViewProfile={handleViewProfile}
         onEditProfile={handleEditProfile}
         onMyBooks={handleMyBooks}
+        onBookShop={handleBookShop}
         onLogout={handleLogout}
       />
       <main>{children}</main>
