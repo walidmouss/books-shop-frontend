@@ -82,7 +82,7 @@ describe("books API routes", () => {
       author: "Tester",
       price: 9.99,
       category: "Test",
-      createdBy: "1",
+      thumbnail: "https://example.com/book.jpg",
     };
     const response = await createBook(
       buildJsonRequest("http://localhost/api/books", "POST", newBook),
@@ -99,7 +99,7 @@ describe("books API routes", () => {
     );
     const payload = await response.json();
 
-    const mine = mockBooks.filter((b) => b.createdBy === mockUser.id);
+    const mine = mockBooks.filter((b) => b.author === mockUser.name);
     const expectedIds = [...mine]
       .sort((a, b) => a.title.localeCompare(b.title))
       .slice(0, 4)
@@ -107,9 +107,9 @@ describe("books API routes", () => {
 
     expect(payload.total).toBe(mine.length);
     expect(payload.items.map((b: (typeof mockBooks)[number]) => b.id)).toEqual(expectedIds);
-    expect(
-      payload.items.every((b: (typeof mockBooks)[number]) => b.createdBy === mockUser.id),
-    ).toBe(true);
+    expect(payload.items.every((b: (typeof mockBooks)[number]) => b.author === mockUser.name)).toBe(
+      true,
+    );
   });
 
   it("returns a book by id", async () => {

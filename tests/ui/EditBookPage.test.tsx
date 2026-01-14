@@ -24,7 +24,7 @@ vi.mock("@/lib/toast/ToastContext", () => ({
 const mockBookByCurrentUser: Book = {
   id: "u-1",
   title: "Test Book",
-  author: "Test Author",
+  author: mockUser.name,
   price: 19.99,
   category: "Programming",
   thumbnail: "https://example.com/image.jpg",
@@ -36,6 +36,7 @@ const mockBookByCurrentUser: Book = {
 
 const mockBookByOtherUser: Book = {
   ...mockBookByCurrentUser,
+  author: "Other Author",
   createdBy: "other-user-id",
 };
 
@@ -85,7 +86,7 @@ describe("EditBookPage", () => {
     renderWithQueryClient(<EditBookPage />);
 
     expect(screen.getByText(/unauthorized/i)).toBeInTheDocument();
-    expect(screen.getByText(/you can only edit books that you created/i)).toBeInTheDocument();
+    expect(screen.getByText(/you can only edit books that you authored/i)).toBeInTheDocument();
   });
 
   it("renders edit form when user is the author", async () => {
@@ -102,7 +103,7 @@ describe("EditBookPage", () => {
     });
 
     expect(screen.getByDisplayValue("Test Book")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Test Author")).toBeInTheDocument();
+    expect(screen.getByDisplayValue(mockUser.name)).toBeInTheDocument();
     expect(screen.getByDisplayValue("19.99")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Programming")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /update book/i })).toBeInTheDocument();
