@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import BooksPage from "@/app/(dashboard)/books/page";
 import { ToastProvider } from "@/lib/toast/ToastContext";
 import type { Book } from "@/lib/types";
@@ -22,6 +23,19 @@ vi.mock("@/lib/queries/useBooks", () => ({
   useBooks: (params: { page: number; pageSize: number; search: string; sort: "asc" | "desc" }) =>
     mockUseBooks(params),
 }));
+
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{ui}</ToastProvider>
+    </QueryClientProvider>,
+  );
+};
 
 describe("BooksPage", () => {
   const items: Book[] = [
@@ -63,11 +77,7 @@ describe("BooksPage", () => {
   });
 
   it("renders books and pagination", () => {
-    render(
-      <ToastProvider>
-        <BooksPage />
-      </ToastProvider>,
-    );
+    renderWithQueryClient(<BooksPage />);
 
     expect(screen.getByText(/books shop/i)).toBeInTheDocument();
     expect(screen.getByText(/Book One/)).toBeInTheDocument();
@@ -76,11 +86,7 @@ describe("BooksPage", () => {
   });
 
   it("calls useBooks with updated page when clicking Next", () => {
-    render(
-      <ToastProvider>
-        <BooksPage />
-      </ToastProvider>,
-    );
+    renderWithQueryClient(<BooksPage />);
 
     const next = screen.getByRole("button", { name: /next/i });
     fireEvent.click(next);

@@ -1,7 +1,7 @@
 import type { Book } from "@/lib/types";
 import { mockUser } from "@/lib/mocks/user";
 
-export const mockBooks: Book[] = [
+const initialBooks: Book[] = [
   {
     id: "1",
     title: "The Great Gatsby",
@@ -235,3 +235,6 @@ export const mockBooks: Book[] = [
     updatedAt: "2024-04-05T00:00:00Z",
   },
 ];
+
+// In-memory database for the session - persists deletions/updates
+export const mockBooks: Book[] = JSON.parse(JSON.stringify(initialBooks));

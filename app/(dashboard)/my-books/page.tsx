@@ -2,18 +2,22 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "@/components/books/BookCard";
 import { BookFilters } from "@/components/books/BookFilters";
 import { Pagination } from "@/components/ui/Pagination";
 import { useMyBooks } from "@/lib/queries/useMyBooks";
 import { useToast } from "@/lib/toast/ToastContext";
+import { mockUser } from "@/lib/mocks/user";
 
 export default function MyBooksPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"asc" | "desc">("asc");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { addToast } = useToast();
 
   const { data, isLoading, isError, refetch, isFetching } = useMyBooks({
@@ -41,8 +45,57 @@ export default function MyBooksPage() {
   function onEdit(id: string) {
     router.push(`/books/${id}/edit`);
   }
-  function onDelete(id: string) {
-    addToast({ type: "info", title: "Delete", description: `Delete book ${id}` });
+  async function onDelete(id: string) {
+    const book = processed.pageItems.find((b) => b.id === id);
+    if (!book) return;
+
+    // Authorization check: Only author can delete (should always be true in My Books)
+    if (book.author !== mockUser.name) {
+      addToast({
+        type: "error",
+        title: "Unauthorized",
+        description: "You can only delete books that you authored.",
+      });
+      return;
+    }
+
+    // Confirmation dialog
+    if (!window.confirm(`Are you sure you want to delete "${book.title}"?`)) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/books/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete book");
+      }
+
+      // Invalidate all book-related caches and force fresh data fetch
+      await queryClient.invalidateQueries({ queryKey: ["books"] });
+      await queryClient.invalidateQueries({ queryKey: ["myBooks"] });
+      await queryClient.invalidateQueries({ queryKey: ["book"] });
+
+      // Explicitly refetch the current page
+      await refetch();
+
+      addToast({
+        type: "success",
+        title: "Book deleted",
+        description: "The book has been deleted successfully.",
+      });
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Delete failed",
+        description: error instanceof Error ? error.message : "Failed to delete book",
+      });
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   return (
@@ -92,6 +145,7 @@ export default function MyBooksPage() {
               onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
+              isDeletingId={deletingId}
             />
           ))}
         </div>

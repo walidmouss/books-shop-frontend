@@ -9,9 +9,17 @@ export interface BookGridProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   isLoading?: boolean;
+  deletingId?: string | null;
 }
 
-export function BookGrid({ books, onView, onEdit, onDelete, isLoading }: BookGridProps) {
+export function BookGrid({
+  books,
+  onView,
+  onEdit,
+  onDelete,
+  isLoading,
+  deletingId,
+}: BookGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -36,7 +44,14 @@ export function BookGrid({ books, onView, onEdit, onDelete, isLoading }: BookGri
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {books.map((book) => (
-        <BookCard key={book.id} book={book} onView={onView} onEdit={onEdit} onDelete={onDelete} />
+        <BookCard
+          key={book.id}
+          book={book}
+          onView={onView}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          isDeletingId={deletingId}
+        />
       ))}
     </div>
   );

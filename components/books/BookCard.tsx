@@ -3,15 +3,20 @@
 import type { Book } from "@/lib/types";
 import Image from "next/image";
 import { BookActions } from "@/components/books/BookActions";
+import { mockUser } from "@/lib/mocks/user";
 
 export interface BookCardProps {
   book: Book;
   onView?: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  isDeletingId?: string | null;
 }
 
-export function BookCard({ book, onView, onEdit, onDelete }: BookCardProps) {
+export function BookCard({ book, onView, onEdit, onDelete, isDeletingId }: BookCardProps) {
+  const isAuthor = book.author === mockUser.name;
+  const isDeleting = isDeletingId === book.id;
+
   return (
     <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/15 dark:bg-neutral-900">
       <div className="aspect-[3/4] overflow-hidden rounded bg-neutral-100 dark:bg-neutral-800">
@@ -39,6 +44,8 @@ export function BookCard({ book, onView, onEdit, onDelete }: BookCardProps) {
             onViewAction={() => onView?.(book.id)}
             onEditAction={() => onEdit?.(book.id)}
             onDeleteAction={() => onDelete?.(book.id)}
+            isAuthor={isAuthor}
+            isDeleting={isDeleting}
           />
         )}
       </div>

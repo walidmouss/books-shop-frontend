@@ -1,15 +1,20 @@
 "use client";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useBookById } from "@/lib/queries/useBookById";
 import { useToast } from "@/lib/toast/ToastContext";
 import { Button } from "@/components/ui/Button";
+import { mockUser } from "@/lib/mocks/user";
 
 export default function BookDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { addToast } = useToast();
   const id = params.id as string;
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data, isLoading, isError } = useBookById(id);
 
@@ -17,9 +22,55 @@ export default function BookDetailsPage() {
     router.push(`/books/${id}/edit`);
   }
 
-  function handleDelete() {
-    addToast({ type: "info", title: "Delete", description: `Delete book ${id}` });
-    // TODO: Implement delete logic
+  async function handleDelete() {
+    if (!data?.book) return;
+
+    // Authorization check: Only author can delete
+    if (data.book.author !== mockUser.name) {
+      addToast({
+        type: "error",
+        title: "Unauthorized",
+        description: "You can only delete books that you authored.",
+      });
+      return;
+    }
+
+    // Confirmation dialog
+    if (!window.confirm(`Are you sure you want to delete "${data.book.title}"?`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/books/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete book");
+      }
+
+      // Invalidate all book-related caches to force fresh data fetch
+      await queryClient.invalidateQueries({ queryKey: ["books"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["myBooks"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["book"] });
+
+      addToast({
+        type: "success",
+        title: "Book deleted",
+        description: "The book has been deleted successfully.",
+      });
+
+      // Navigate back to books list
+      router.push("/books");
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Delete failed",
+        description: error instanceof Error ? error.message : "Failed to delete book",
+      });
+      setIsDeleting(false);
+    }
   }
 
   function handleView() {
@@ -46,6 +97,7 @@ export default function BookDetailsPage() {
   }
 
   const { book } = data;
+  const isAuthor = book.author === mockUser.name;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -58,12 +110,16 @@ export default function BookDetailsPage() {
           <Button variant="outline" onClick={handleView}>
             View
           </Button>
-          <Button variant="outline" onClick={handleEdit}>
-            Edit
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            Delete
-          </Button>
+          {isAuthor && (
+            <>
+              <Button variant="outline" onClick={handleEdit}>
+                Edit
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

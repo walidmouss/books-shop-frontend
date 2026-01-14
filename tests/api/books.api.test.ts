@@ -188,4 +188,17 @@ describe("books API routes", () => {
     expect(response.status).toBe(200);
     expect(payload.success).toBe(true);
   });
+
+  it("returns 404 when deleting a non-existent book", async () => {
+    const response = await removeBook(
+      buildRequest("http://localhost/api/books/nonexistent", { method: "DELETE" }),
+      {
+        params: Promise.resolve({ id: "nonexistent" }),
+      },
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload.error).toBe("Book not found");
+  });
 });

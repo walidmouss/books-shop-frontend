@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
     const search = (searchParams.get("search") || "").toLowerCase();
     const sort = (searchParams.get("sort") === "desc" ? "desc" : "asc") as "asc" | "desc";
 
+    console.log(
+      `[GET /api/books] Current mockBooks count: ${mockBooks.length}, page: ${page}, search: "${search}"`,
+    );
     let data = [...mockBooks];
 
     if (search) {
