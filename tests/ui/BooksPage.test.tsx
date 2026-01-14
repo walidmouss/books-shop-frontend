@@ -5,6 +5,13 @@ import BooksPage from "@/app/(dashboard)/books/page";
 import { ToastProvider } from "@/lib/toast/ToastContext";
 import type { Book } from "@/lib/types";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    back: vi.fn(),
+  }),
+}));
+
 vi.mock("next/image", () => ({
   __esModule: true,
   default: () => <span data-testid="next-image" />,

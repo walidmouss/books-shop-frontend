@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BookCard } from "@/components/books/BookCard";
 import { BookFilters } from "@/components/books/BookFilters";
 import { Pagination } from "@/components/ui/Pagination";
@@ -8,6 +9,7 @@ import { useMyBooks } from "@/lib/queries/useMyBooks";
 import { useToast } from "@/lib/toast/ToastContext";
 
 export default function MyBooksPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
   const [search, setSearch] = useState("");
@@ -34,7 +36,7 @@ export default function MyBooksPage() {
   }, []);
 
   function onView(id: string) {
-    addToast({ type: "info", title: "View", description: `Open details for ${id}` });
+    router.push(`/books/${id}`);
   }
   function onEdit(id: string) {
     addToast({ type: "info", title: "Edit", description: `Edit book ${id}` });
