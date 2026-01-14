@@ -76,6 +76,63 @@ describe("books API routes", () => {
     expect(payload.items.map((b: (typeof mockBooks)[number]) => b.id)).toEqual(expectedIds);
   });
 
+  it("filters books by category", async () => {
+    const response = await listBooks(
+      buildRequest("http://localhost/api/books?category=Programming"),
+    );
+    const payload = await response.json();
+
+    expect(payload.total).toBeGreaterThan(0);
+    expect(
+      payload.items.every((b: (typeof mockBooks)[number]) => b.category === "Programming"),
+    ).toBe(true);
+  });
+
+  it("filters books by price range", async () => {
+    const minPrice = 15;
+    const maxPrice = 25;
+    const response = await listBooks(
+      buildRequest(`http://localhost/api/books?minPrice=${minPrice}&maxPrice=${maxPrice}`),
+    );
+    const payload = await response.json();
+
+    expect(payload.total).toBeGreaterThan(0);
+    expect(
+      payload.items.every(
+        (b: (typeof mockBooks)[number]) => b.price >= minPrice && b.price <= maxPrice,
+      ),
+    ).toBe(true);
+  });
+
+  it("filters books by category and price range combined", async () => {
+    const category = "Programming";
+    const minPrice = 15;
+    const maxPrice = 30;
+    const response = await listBooks(
+      buildRequest(
+        `http://localhost/api/books?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
+      ),
+    );
+    const payload = await response.json();
+
+    expect(
+      payload.items.every(
+        (b: (typeof mockBooks)[number]) =>
+          b.category === category && b.price >= minPrice && b.price <= maxPrice,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns empty results when no books match filters", async () => {
+    const response = await listBooks(
+      buildRequest("http://localhost/api/books?category=NonExistentCategory"),
+    );
+    const payload = await response.json();
+
+    expect(payload.total).toBe(0);
+    expect(payload.items).toEqual([]);
+  });
+
   it("creates a book via POST with required fields", async () => {
     const initialCount = mockBooks.length;
     const newBook = {

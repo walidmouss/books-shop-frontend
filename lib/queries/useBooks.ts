@@ -8,6 +8,9 @@ export type BooksQuery = {
   pageSize: number;
   search: string;
   sort: "asc" | "desc";
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export type BooksResponse = {
@@ -18,9 +21,12 @@ export type BooksResponse = {
 };
 
 async function fetchBooks(params: BooksQuery): Promise<BooksResponse> {
-  const { page, pageSize, search, sort } = params;
+  const { page, pageSize, search, sort, category, minPrice, maxPrice } = params;
   const query = new URLSearchParams();
   if (search) query.set("search", search);
+  if (category) query.set("category", category);
+  if (minPrice !== undefined) query.set("minPrice", String(minPrice));
+  if (maxPrice !== undefined) query.set("maxPrice", String(maxPrice));
   query.set("page", String(page));
   query.set("pageSize", String(pageSize));
   query.set("sort", sort);
@@ -51,7 +57,7 @@ async function fetchBooks(params: BooksQuery): Promise<BooksResponse> {
 
 export function useBooks(params: BooksQuery) {
   return useQuery<BooksResponse>({
-    queryKey: ["books", params.page, params.pageSize, params.search, params.sort],
+    queryKey: ["books", params.page, params.pageSize, params.search, params.sort, params.category, params.minPrice, params.maxPrice],
     queryFn: () => fetchBooks(params),
   });
 }

@@ -4,7 +4,7 @@ import { mockUser } from "@/lib/mocks/user";
 import { createBookSchema } from "@/lib/validators/book.schema";
 import type { Book } from "@/lib/types";
 
-// Mock books API endpoints with server-side search/sort/pagination
+// Mock books API endpoints with server-side search/sort/pagination/filtering
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,16 +12,29 @@ export async function GET(request: NextRequest) {
     const pageSize = Math.max(1, parseInt(searchParams.get("pageSize") || "12", 10));
     const search = (searchParams.get("search") || "").toLowerCase();
     const sort = (searchParams.get("sort") === "desc" ? "desc" : "asc") as "asc" | "desc";
+    const category = (searchParams.get("category") || "").trim();
+    const minPrice = parseFloat(searchParams.get("minPrice") || "0");
+    const maxPrice = parseFloat(searchParams.get("maxPrice") || "Infinity");
 
     console.log(
-      `[GET /api/books] Current mockBooks count: ${mockBooks.length}, page: ${page}, search: "${search}"`,
+      `[GET /api/books] Current mockBooks count: ${mockBooks.length}, page: ${page}, search: "${search}", category: "${category}", price range: ${minPrice}-${maxPrice}`,
     );
     let data = [...mockBooks];
 
+    // Apply search filter
     if (search) {
       data = data.filter((b) => b.title.toLowerCase().includes(search));
     }
 
+    // Apply category filter
+    if (category) {
+      data = data.filter((b) => b.category === category);
+    }
+
+    // Apply price range filter
+    data = data.filter((b) => b.price >= minPrice && b.price <= maxPrice);
+
+    // Apply sort
     data.sort((a, b) => {
       const res = a.title.localeCompare(b.title);
       return sort === "asc" ? res : -res;
