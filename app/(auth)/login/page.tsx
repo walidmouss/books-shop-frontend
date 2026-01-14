@@ -1,21 +1,51 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useToast } from "@/lib/toast/ToastContext";
 import { LoginForm } from "@/components/forms/LoginForm";
 import { APP_NAME } from "@/lib/constants";
 import type { LoginFormData } from "@/lib/validators/auth.schema";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { addToast } = useToast();
 
   const handleLogin = async (data: LoginFormData) => {
-    // Simulate API call
-    console.debug("Login attempt with:", { email: data.email });
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    // For now, just redirect to books page
-    // In production, this would call a server action for authentication
-    router.push("/books");
+      if (!response.ok) {
+        addToast({
+          type: "error",
+          title: "Invalid credentials",
+          description: "Please check your email and password",
+        });
+        return;
+      }
+
+      addToast({
+        type: "success",
+        title: "Login successful",
+        description: "Redirecting to dashboard...",
+      });
+
+      // Cookie is set automatically by the server
+      // Redirect to books page after a brief delay
+      setTimeout(() => {
+        router.push("/books");
+      }, 1000);
+    } catch (error) {
+      console.error("Login error:", error);
+      addToast({
+        type: "error",
+        title: "Something went wrong",
+        description: "Please try again later",
+      });
+    }
   };
 
   return (

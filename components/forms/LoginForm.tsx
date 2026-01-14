@@ -37,7 +37,12 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(handleFormSubmit)}
+      noValidate
+      autoComplete="off"
+      className="space-y-6"
+    >
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-black dark:text-white">
           Email Address

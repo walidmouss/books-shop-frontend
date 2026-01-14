@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Mock login endpoint - will be replaced with real authentication
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
-    // TODO: Implement actual authentication logic
-    // For now, just validate demo credentials
-    if (email === "admin@books.com" && password === "admin123") {
-      return NextResponse.json({
-        user: {
-          id: "1",
-          email: "admin@books.com",
-          name: "Admin User",
-          createdAt: new Date().toISOString(),
-        },
-      });
+    if (email !== "admin@books.com" || password !== "admin123") {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    const response = NextResponse.json({
+      user: {
+        id: "1",
+        email,
+        name: "Admin User",
+      },
+    });
+
+    response.cookies.set("auth-token", "true", {
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return response;
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
