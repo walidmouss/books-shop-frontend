@@ -17,7 +17,15 @@ export interface NavbarProps {
   onLogout?: () => void;
 }
 
-export function Navbar({ user, currentPath, onViewProfile, onEditProfile, onMyBooks, onBookShop, onLogout }: NavbarProps) {
+export function Navbar({
+  user,
+  currentPath,
+  onViewProfile,
+  onEditProfile,
+  onMyBooks,
+  onBookShop,
+  onLogout,
+}: NavbarProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
