@@ -11,8 +11,9 @@ export async function GET(request: NextRequest) {
     const search = (searchParams.get("search") || "").toLowerCase();
     const sort = (searchParams.get("sort") === "desc" ? "desc" : "asc") as "asc" | "desc";
 
-    // Filter books authored by current user
-    let data = mockBooks.filter((b) => b.author === mockUser.name);
+    // Filter books by current user ID instead of author name
+    // This ensures books remain associated with the user even if they change their name
+    let data = mockBooks.filter((b) => b.createdBy === mockUser.id);
 
     console.log(
       `[GET /api/books/my-books] Total mockBooks: ${mockBooks.length}, Current user: ${mockUser.name}, My books: ${data.length}, page: ${page}`,

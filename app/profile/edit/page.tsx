@@ -60,9 +60,6 @@ export default function EditProfilePage() {
             name: user.name,
             email: user.email,
           }}
-          onSuccess={() => {
-            router.push("/profile");
-          }}
         />
 
         <div className="mt-6 border-t border-black/10 pt-6 dark:border-white/15">

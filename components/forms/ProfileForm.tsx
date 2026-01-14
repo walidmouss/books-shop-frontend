@@ -20,10 +20,9 @@ export type ProfileFormData = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
   initialData: ProfileFormData;
-  onSuccess?: () => void;
 }
 
-export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
+export function ProfileForm({ initialData }: ProfileFormProps) {
   const { addToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
