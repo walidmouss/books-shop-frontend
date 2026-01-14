@@ -57,7 +57,16 @@ async function fetchBooks(params: BooksQuery): Promise<BooksResponse> {
 
 export function useBooks(params: BooksQuery) {
   return useQuery<BooksResponse>({
-    queryKey: ["books", params.page, params.pageSize, params.search, params.sort, params.category, params.minPrice, params.maxPrice],
+    queryKey: [
+      "books",
+      params.page,
+      params.pageSize,
+      params.search,
+      params.sort,
+      params.category,
+      params.minPrice,
+      params.maxPrice,
+    ],
     queryFn: () => fetchBooks(params),
   });
 }

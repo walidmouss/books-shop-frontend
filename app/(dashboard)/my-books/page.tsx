@@ -17,6 +17,9 @@ export default function MyBooksPage() {
   const [pageSize] = useState(12);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"asc" | "desc">("asc");
+  const [category, setCategory] = useState("");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { addToast } = useToast();
 
@@ -25,6 +28,9 @@ export default function MyBooksPage() {
     pageSize,
     search,
     sort,
+    category,
+    minPrice,
+    maxPrice,
   });
 
   const processed = useMemo(() => {
@@ -33,11 +39,23 @@ export default function MyBooksPage() {
     return { total, pageItems: items };
   }, [data]);
 
-  const onFiltersChange = useCallback((v: { search: string; sort: "asc" | "desc" }) => {
-    setSearch(v.search);
-    setSort(v.sort);
-    setPage(1);
-  }, []);
+  const onFiltersChange = useCallback(
+    (v: {
+      search: string;
+      sort: "asc" | "desc";
+      category: string;
+      minPrice: number;
+      maxPrice: number;
+    }) => {
+      setSearch(v.search);
+      setSort(v.sort);
+      setCategory(v.category);
+      setMinPrice(v.minPrice);
+      setMaxPrice(v.maxPrice);
+      setPage(1);
+    },
+    [],
+  );
 
   function onView(id: string) {
     router.push(`/books/${id}`);
@@ -114,7 +132,14 @@ export default function MyBooksPage() {
       </div>
 
       <div className="mb-6 rounded-lg border border-black/10 bg-white p-4 dark:border-white/15 dark:bg-neutral-900">
-        <BookFilters initialSearch={search} initialSort={sort} onChangeAction={onFiltersChange} />
+        <BookFilters
+          initialSearch={search}
+          initialSort={sort}
+          initialCategory={category}
+          initialMinPrice={minPrice}
+          initialMaxPrice={maxPrice}
+          onChangeAction={onFiltersChange}
+        />
       </div>
 
       {isError ? (

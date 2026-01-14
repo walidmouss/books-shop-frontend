@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
     const pageSize = Math.max(1, parseInt(searchParams.get("pageSize") || "12", 10));
     const search = (searchParams.get("search") || "").toLowerCase();
     const sort = (searchParams.get("sort") === "desc" ? "desc" : "asc") as "asc" | "desc";
+    const category = searchParams.get("category") || "";
+    const minPrice = parseFloat(searchParams.get("minPrice") || "0");
+    const maxPrice = parseFloat(searchParams.get("maxPrice") || "Infinity");
 
     // Filter books by current user ID instead of author name
     // This ensures books remain associated with the user even if they change their name
@@ -23,6 +26,14 @@ export async function GET(request: NextRequest) {
     if (search) {
       data = data.filter((b) => b.title.toLowerCase().includes(search));
     }
+
+    // Apply category filter
+    if (category) {
+      data = data.filter((b) => b.category === category);
+    }
+
+    // Apply price range filter
+    data = data.filter((b) => b.price >= minPrice && b.price <= maxPrice);
 
     // Apply sort by title
     data.sort((a, b) => {
