@@ -7,6 +7,7 @@ export const ROUTES = {
   BOOKS: "/books",
   MY_BOOKS: "/my-books",
   PROFILE: "/profile",
+  PROFILE_EDIT: "/profile/edit",
   BOOK_NEW: "/books/new",
   BOOK_DETAILS: (id: string) => `/books/${id}`,
   BOOK_EDIT: (id: string) => `/books/${id}/edit`,
@@ -23,7 +24,10 @@ export const API_ROUTES = {
     MY_BOOKS: "/api/books/my-books",
     BY_ID: (id: string) => `/api/books/${id}`,
   },
-  PROFILE: "/api/profile",
+  PROFILE: {
+    GET: "/api/profile",
+    UPDATE: "/api/profile",
+  },
 } as const;
 
 export const DEMO_CREDENTIALS = {

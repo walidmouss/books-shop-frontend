@@ -9,24 +9,38 @@ import type { User } from "@/lib/types";
 
 export interface NavbarProps {
   user: User | null;
+  onViewProfile?: () => void;
+  onEditProfile?: () => void;
+  onLogout?: () => void;
 }
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, onViewProfile, onEditProfile, onLogout }: NavbarProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleEditProfile = useCallback(() => {
-    router.push(ROUTES.PROFILE);
-  }, [router]);
+  const handleViewProfile = useCallback(() => {
+    onViewProfile?.();
+  }, [onViewProfile]);
 
-  const handleLogout = useCallback(() => {
+  const handleEditProfile = useCallback(() => {
+    onEditProfile?.();
+  }, [onEditProfile]);
+
+  const handleLogout = useCallback(async () => {
     setIsLoading(true);
-    // Simulated logout - will be replaced with actual server action
-    setTimeout(() => {
-      router.push(ROUTES.LOGIN);
+    try {
+      // Call logout callback which will redirect to /login
+      if (onLogout) {
+        await Promise.resolve(onLogout());
+      } else {
+        // Fallback if no callback provided
+        await router.push(ROUTES.LOGIN);
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
       setIsLoading(false);
-    }, 500);
-  }, [router]);
+    }
+  }, [onLogout, router]);
 
   return (
     <header className="border-b border-black/10 bg-white dark:border-white/15 dark:bg-neutral-900">
@@ -36,7 +50,12 @@ export function Navbar({ user }: NavbarProps) {
         </Link>
 
         {user && !isLoading && (
-          <ProfileMenu user={user} onEditProfile={handleEditProfile} onLogout={handleLogout} />
+          <ProfileMenu
+            user={user}
+            onViewProfile={handleViewProfile}
+            onEditProfile={handleEditProfile}
+            onLogout={handleLogout}
+          />
         )}
 
         {isLoading && (

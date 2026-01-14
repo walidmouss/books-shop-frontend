@@ -79,11 +79,14 @@ describe("profile API routes", () => {
 
   it("updates profile via PUT", async () => {
     const response = await updateProfile(
-      buildJsonRequest("http://localhost/api/profile", "PUT", { name: "New Name" }),
+      buildJsonRequest("http://localhost/api/profile", "PUT", {
+        name: "New Name",
+        email: "newemail@books.com",
+      }),
     );
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.user).toMatchObject({ id: "1", name: "New Name" });
+    expect(payload.user).toMatchObject({ id: "1", name: "New Name", email: "newemail@books.com" });
   });
 });

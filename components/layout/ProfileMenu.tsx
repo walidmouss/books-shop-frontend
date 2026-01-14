@@ -5,11 +5,12 @@ import type { User } from "@/lib/types";
 
 export interface ProfileMenuProps {
   user: User;
+  onViewProfile?: () => void;
   onEditProfile: () => void;
   onLogout: () => void;
 }
 
-export function ProfileMenu({ user, onEditProfile, onLogout }: ProfileMenuProps) {
+export function ProfileMenu({ user, onViewProfile, onEditProfile, onLogout }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +63,7 @@ export function ProfileMenu({ user, onEditProfile, onLogout }: ProfileMenuProps)
           <button
             onClick={() => {
               setIsOpen(false);
+              onViewProfile?.();
             }}
             className="block w-full px-4 py-2 text-left text-sm text-black hover:bg-neutral-50 dark:text-white dark:hover:bg-neutral-800"
           >
