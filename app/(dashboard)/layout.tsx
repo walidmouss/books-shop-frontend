@@ -33,6 +33,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push("/profile/edit");
   }, [router]);
 
+  const handleMyBooks = useCallback(() => {
+    router.push("/my-books");
+  }, [router]);
+
   const handleLogout = useCallback(async () => {
     try {
       // Call logout API to clear auth token on server
@@ -51,6 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         user={user}
         onViewProfile={handleViewProfile}
         onEditProfile={handleEditProfile}
+        onMyBooks={handleMyBooks}
         onLogout={handleLogout}
       />
       <main>{children}</main>

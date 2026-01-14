@@ -7,10 +7,17 @@ export interface ProfileMenuProps {
   user: User;
   onViewProfile?: () => void;
   onEditProfile: () => void;
+  onMyBooks?: () => void;
   onLogout: () => void;
 }
 
-export function ProfileMenu({ user, onViewProfile, onEditProfile, onLogout }: ProfileMenuProps) {
+export function ProfileMenu({
+  user,
+  onViewProfile,
+  onEditProfile,
+  onMyBooks,
+  onLogout,
+}: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -78,6 +85,16 @@ export function ProfileMenu({ user, onViewProfile, onEditProfile, onLogout }: Pr
             className="block w-full px-4 py-2 text-left text-sm text-black hover:bg-neutral-50 dark:text-white dark:hover:bg-neutral-800"
           >
             Edit Profile
+          </button>
+
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              onMyBooks?.();
+            }}
+            className="block w-full px-4 py-2 text-left text-sm text-black hover:bg-neutral-50 dark:text-white dark:hover:bg-neutral-800"
+          >
+            My Books
           </button>
 
           <button

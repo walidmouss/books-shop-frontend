@@ -11,10 +11,11 @@ export interface NavbarProps {
   user: User | null;
   onViewProfile?: () => void;
   onEditProfile?: () => void;
+  onMyBooks?: () => void;
   onLogout?: () => void;
 }
 
-export function Navbar({ user, onViewProfile, onEditProfile, onLogout }: NavbarProps) {
+export function Navbar({ user, onViewProfile, onEditProfile, onMyBooks, onLogout }: NavbarProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,6 +26,10 @@ export function Navbar({ user, onViewProfile, onEditProfile, onLogout }: NavbarP
   const handleEditProfile = useCallback(() => {
     onEditProfile?.();
   }, [onEditProfile]);
+
+  const handleMyBooks = useCallback(() => {
+    onMyBooks?.();
+  }, [onMyBooks]);
 
   const handleLogout = useCallback(async () => {
     setIsLoading(true);
@@ -54,6 +59,7 @@ export function Navbar({ user, onViewProfile, onEditProfile, onLogout }: NavbarP
             user={user}
             onViewProfile={handleViewProfile}
             onEditProfile={handleEditProfile}
+            onMyBooks={handleMyBooks}
             onLogout={handleLogout}
           />
         )}
