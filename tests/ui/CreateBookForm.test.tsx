@@ -2,7 +2,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CreateBookForm } from "@/components/forms/CreateBookForm";
-import type { CreateBookFormData } from "@/lib/validators/book.schema";
 
 describe("CreateBookForm", () => {
   beforeEach(() => {

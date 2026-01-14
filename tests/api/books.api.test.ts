@@ -270,7 +270,9 @@ describe("books API routes", () => {
     const listPayload = await listResponse.json();
 
     // The newly created book should be in the list
-    const createdBook = listPayload.items.find((b: any) => b.id === createPayload.book.id);
+    const createdBook = listPayload.items.find(
+      (b: (typeof mockBooks)[number]) => b.id === createPayload.book.id,
+    );
     expect(createdBook).toBeDefined();
     expect(createdBook.title).toBe("My New Test Book");
     expect(createdBook.author).toBe(mockUser.name);

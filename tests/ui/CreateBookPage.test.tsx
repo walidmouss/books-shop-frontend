@@ -50,10 +50,15 @@ describe("CreateBookPage", () => {
     const mockPush = vi.fn();
     vi.spyOn(router, "useRouter").mockReturnValue({
       push: mockPush,
-    } as any);
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+    } as unknown as ReturnType<typeof router.useRouter>);
 
     const user = userEvent.setup();
-    (global.fetch as any).mockResolvedValueOnce({
+    vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         book: {
@@ -65,7 +70,7 @@ describe("CreateBookPage", () => {
           thumbnail: "https://example.com/book.jpg",
         },
       }),
-    });
+    } as Response);
 
     renderWithProviders(<CreateBookPage />);
 
@@ -96,7 +101,6 @@ describe("CreateBookPage", () => {
   });
 
   it("validates category selection", async () => {
-    const user = userEvent.setup();
     renderWithProviders(<CreateBookPage />);
 
     const categorySelect = screen.getByLabelText(/category/i) as HTMLSelectElement;
