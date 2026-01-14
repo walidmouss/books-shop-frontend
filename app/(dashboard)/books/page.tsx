@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { BookGrid } from "@/components/books/BookGrid";
 import { BookFilters } from "@/components/books/BookFilters";
 import { Pagination } from "@/components/ui/Pagination";
@@ -27,11 +27,11 @@ export default function BooksPage() {
     return { total, pageItems: items };
   }, [data]);
 
-  function onFiltersChange(v: { search: string; sort: "asc" | "desc" }) {
+  const onFiltersChange = useCallback((v: { search: string; sort: "asc" | "desc" }) => {
     setSearch(v.search);
     setSort(v.sort);
     setPage(1);
-  }
+  }, []);
 
   function onView(id: string) {
     addToast({ type: "info", title: "View", description: `Open details for ${id}` });
