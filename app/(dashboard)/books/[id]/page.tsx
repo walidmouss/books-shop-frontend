@@ -14,8 +14,7 @@ export default function BookDetailsPage() {
   const { data, isLoading, isError } = useBookById(id);
 
   function handleEdit() {
-    addToast({ type: "info", title: "Edit", description: `Edit book ${id}` });
-    // TODO: Navigate to edit page
+    router.push(`/books/${id}/edit`);
   }
 
   function handleDelete() {

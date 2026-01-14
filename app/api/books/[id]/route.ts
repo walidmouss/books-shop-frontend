@@ -24,9 +24,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
+    const bookIndex = mockBooks.findIndex((b) => b.id === id);
+
+    if (bookIndex === -1) {
+      return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    }
+
     const body = await request.json();
-    // TODO: Validate and update book in database
-    return NextResponse.json({ book: { id, ...body } });
+    const existingBook = mockBooks[bookIndex];
+
+    // Update the book in the mock array (simulating database update)
+    const updatedBook = {
+      ...existingBook,
+      ...body,
+      id, // Ensure id doesn't change
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockBooks[bookIndex] = updatedBook;
+
+    return NextResponse.json({ book: updatedBook });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

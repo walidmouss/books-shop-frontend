@@ -142,6 +142,40 @@ describe("books API routes", () => {
     expect(payload.book).toMatchObject({ id: "u-1", title: "Updated" });
   });
 
+  it("updates a book with all fields via PUT", async () => {
+    const updatedData = {
+      title: "Completely Updated Book",
+      author: "New Author",
+      price: 99.99,
+      category: "Science",
+      description: "An updated description",
+      thumbnail: "https://example.com/new-thumbnail.jpg",
+    };
+
+    const response = await updateBook(
+      buildJsonRequest("http://localhost/api/books/u-1", "PUT", updatedData),
+      { params: Promise.resolve({ id: "u-1" }) },
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.book).toMatchObject({
+      id: "u-1",
+      ...updatedData,
+    });
+  });
+
+  it("returns 404 when updating a non-existent book", async () => {
+    const response = await updateBook(
+      buildJsonRequest("http://localhost/api/books/nonexistent", "PUT", { title: "Updated" }),
+      { params: Promise.resolve({ id: "nonexistent" }) },
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload.error).toBe("Book not found");
+  });
+
   it("removes a book via DELETE", async () => {
     const response = await removeBook(
       buildRequest("http://localhost/api/books/u-1", { method: "DELETE" }),

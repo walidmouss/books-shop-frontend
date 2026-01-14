@@ -39,7 +39,7 @@ export default function BooksPage() {
     router.push(`/books/${id}`);
   }
   function onEdit(id: string) {
-    addToast({ type: "info", title: "Edit", description: `Edit book ${id}` });
+    router.push(`/books/${id}/edit`);
   }
   function onDelete(id: string) {
     addToast({ type: "info", title: "Delete", description: `Delete book ${id}` });
