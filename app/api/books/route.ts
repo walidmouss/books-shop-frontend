@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockBooks } from "@/lib/mocks/books";
+import { mockUser } from "@/lib/mocks/user";
+import { createBookSchema } from "@/lib/validators/book.schema";
+import type { Book } from "@/lib/types";
 
 // Mock books API endpoints with server-side search/sort/pagination
 export async function GET(request: NextRequest) {
@@ -37,9 +40,45 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    // TODO: Validate and create book in database
-    return NextResponse.json({ book: { id: "new", ...body } }, { status: 201 });
-  } catch {
+
+    // Validate request body
+    const validation = createBookSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Invalid book data", details: validation.error.errors },
+        { status: 400 },
+      );
+    }
+
+    const { title, price, category, description, thumbnail } = validation.data;
+
+    // Generate unique ID
+    const id = `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const now = new Date().toISOString();
+
+    // Create new book with current user as author
+    const newBook: Book = {
+      id,
+      title,
+      author: mockUser.name,
+      price,
+      category,
+      description: description || "",
+      thumbnail,
+      createdBy: mockUser.id,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    // Add to mock books
+    mockBooks.push(newBook);
+    console.log(
+      `[POST /api/books] Created new book: "${title}" (id: ${id}), mockBooks count: ${mockBooks.length}, book author: ${newBook.author}`,
+    );
+
+    return NextResponse.json({ book: newBook }, { status: 201 });
+  } catch (error) {
+    console.error("[POST /api/books] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

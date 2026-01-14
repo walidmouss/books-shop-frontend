@@ -14,6 +14,10 @@ export async function GET(request: NextRequest) {
     // Filter books authored by current user
     let data = mockBooks.filter((b) => b.author === mockUser.name);
 
+    console.log(
+      `[GET /api/books/my-books] Total mockBooks: ${mockBooks.length}, Current user: ${mockUser.name}, My books: ${data.length}, page: ${page}`,
+    );
+
     // Apply search by title
     if (search) {
       data = data.filter((b) => b.title.toLowerCase().includes(search));

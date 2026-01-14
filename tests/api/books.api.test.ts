@@ -76,13 +76,14 @@ describe("books API routes", () => {
     expect(payload.items.map((b: (typeof mockBooks)[number]) => b.id)).toEqual(expectedIds);
   });
 
-  it("creates a book via POST", async () => {
+  it("creates a book via POST with required fields", async () => {
+    const initialCount = mockBooks.length;
     const newBook = {
-      title: "New Book",
-      author: "Tester",
-      price: 9.99,
-      category: "Test",
-      thumbnail: "https://example.com/book.jpg",
+      title: "New Testing Book",
+      price: 19.99,
+      category: "Technology",
+      description: "A book created by tests",
+      thumbnail: "https://example.com/test-book.jpg",
     };
     const response = await createBook(
       buildJsonRequest("http://localhost/api/books", "POST", newBook),
@@ -90,7 +91,16 @@ describe("books API routes", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(201);
-    expect(payload.book).toMatchObject({ id: "new", ...newBook });
+    expect(payload.book).toMatchObject({
+      title: newBook.title,
+      price: newBook.price,
+      category: newBook.category,
+      description: newBook.description,
+      thumbnail: newBook.thumbnail,
+    });
+    // Verify it was added to mockBooks
+    expect(mockBooks.length).toBe(initialCount + 1);
+    expect(mockBooks.some((b) => b.id === payload.book.id)).toBe(true);
   });
 
   it("filters my books by current user and paginates", async () => {
@@ -200,5 +210,69 @@ describe("books API routes", () => {
 
     expect(response.status).toBe(404);
     expect(payload.error).toBe("Book not found");
+  });
+
+  it("returns 400 when creating a book with invalid data", async () => {
+    const invalidBook = {
+      title: "", // Empty title
+      price: "invalid", // Invalid price
+      // Missing required fields
+    };
+    const response = await createBook(
+      buildJsonRequest("http://localhost/api/books", "POST", invalidBook),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error).toBe("Invalid book data");
+    expect(payload.details).toBeDefined();
+  });
+
+  it("returns 400 when creating a book with invalid category", async () => {
+    const invalidBook = {
+      title: "Test Book",
+      price: 19.99,
+      category: "InvalidCategory", // Not in BOOK_CATEGORIES
+      description: "Test description",
+      thumbnail: "https://example.com/book.jpg",
+    };
+    const response = await createBook(
+      buildJsonRequest("http://localhost/api/books", "POST", invalidBook),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error).toBe("Invalid book data");
+  });
+
+  it("newly created book appears in my books list", async () => {
+    const newBook = {
+      title: "My New Test Book",
+      price: 24.99,
+      category: "Science",
+      description: "A test book I created",
+      thumbnail: "https://example.com/my-book.jpg",
+    };
+
+    // Create the book
+    const createResponse = await createBook(
+      buildJsonRequest("http://localhost/api/books", "POST", newBook),
+    );
+    const createPayload = await createResponse.json();
+
+    expect(createResponse.status).toBe(201);
+    expect(createPayload.book.author).toBe(mockUser.name);
+
+    // Fetch my books
+    const listResponse = await listMyBooks(
+      buildRequest("http://localhost/api/books/my-books?page=1&pageSize=20"),
+    );
+    const listPayload = await listResponse.json();
+
+    // The newly created book should be in the list
+    const createdBook = listPayload.items.find((b: any) => b.id === createPayload.book.id);
+    expect(createdBook).toBeDefined();
+    expect(createdBook.title).toBe("My New Test Book");
+    expect(createdBook.author).toBe(mockUser.name);
   });
 });
