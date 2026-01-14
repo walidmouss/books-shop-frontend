@@ -53,7 +53,7 @@ export default function BookDetailsPage() {
       // Invalidate all book-related caches to force fresh data fetch
       await queryClient.invalidateQueries({ queryKey: ["books"], exact: false });
       await queryClient.invalidateQueries({ queryKey: ["myBooks"], exact: false });
-      await queryClient.invalidateQueries({ queryKey: ["book"] });
+      await queryClient.invalidateQueries({ queryKey: ["book"], exact: false });
 
       addToast({
         type: "success",

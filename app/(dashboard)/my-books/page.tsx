@@ -75,9 +75,9 @@ export default function MyBooksPage() {
       }
 
       // Invalidate all book-related caches and force fresh data fetch
-      await queryClient.invalidateQueries({ queryKey: ["books"] });
-      await queryClient.invalidateQueries({ queryKey: ["myBooks"] });
-      await queryClient.invalidateQueries({ queryKey: ["book"] });
+      await queryClient.invalidateQueries({ queryKey: ["books"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["myBooks"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["book"], exact: false });
 
       // Explicitly refetch the current page
       await refetch();

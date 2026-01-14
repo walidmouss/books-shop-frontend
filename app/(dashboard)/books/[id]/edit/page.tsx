@@ -35,9 +35,9 @@ export default function EditBookPage() {
         throw new Error("Failed to update book");
       }
       // Invalidate and refetch book data
-      await queryClient.invalidateQueries({ queryKey: ["book", id] });
-      await queryClient.invalidateQueries({ queryKey: ["books"] });
-      await queryClient.invalidateQueries({ queryKey: ["myBooks"] });
+      await queryClient.invalidateQueries({ queryKey: ["book", id], exact: true });
+      await queryClient.invalidateQueries({ queryKey: ["books"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["myBooks"], exact: false });
 
       addToast({
         type: "success",

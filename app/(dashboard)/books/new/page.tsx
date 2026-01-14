@@ -31,14 +31,20 @@ export default function CreateBookPage() {
 
       const { book } = await response.json();
 
-      // Invalidate all book-related caches to ensure fresh data
+      // Invalidate all book-related caches
       await queryClient.invalidateQueries({ queryKey: ["books"], exact: false });
       await queryClient.invalidateQueries({ queryKey: ["myBooks"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["book"], exact: false });
 
-      // Explicitly refetch myBooks with page 1 to show the new book
-      await queryClient.refetchQueries({
-        queryKey: ["myBooks"],
-        exact: false,
+      // Prefetch the myBooks query for page 1 to ensure fresh data is available
+      // when the component mounts after redirect
+      await queryClient.prefetchQuery({
+        queryKey: ["myBooks", 1, 12, "", "asc"],
+        queryFn: async () => {
+          const res = await fetch("/api/books/my-books?page=1&pageSize=12&sort=asc");
+          if (!res.ok) throw new Error("Failed to fetch books");
+          return res.json();
+        },
       });
 
       addToast({
